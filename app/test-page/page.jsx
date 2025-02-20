@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export default async function Page() {
   const api = axios.create({
-    baseURL: 'https://site-b.netlify.app',
+    baseURL: 'https://astro-function-site.netlify.app/'
   });
 
   const serviceToken = 'test-token';
@@ -11,7 +11,7 @@ export default async function Page() {
   const params = { someParam: 'value' };
 
   const apiResponse = await api.get(
-    `/.netlify/functions/endpoint/${hotelId}`,
+    `/.netlify/functions/test-endpoint/${hotelId}`,
     {
       headers: {
         Authorization: `Bearer ${serviceToken}`,
