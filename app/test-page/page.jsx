@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export default async function Page() {
   const api = axios.create({
-    baseURL: 'https://astro-function-site.netlify.app/'
+    baseURL: 'https://astro-function-site.netlify.app'
   });
 
   const serviceToken = 'test-token';
@@ -26,6 +26,7 @@ export default async function Page() {
   );
   
   return <div>
+    <h1>Test Page</h1>
     <p>Timestamp: {apiResponse.data.timestamp}</p>
     <p>Random: {apiResponse.data.random}</p>
   </div>;
