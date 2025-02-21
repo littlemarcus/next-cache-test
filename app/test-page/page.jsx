@@ -35,8 +35,68 @@
 
 // copying customer setup
 
-import merge from 'deepmerge';
-import fetchRetry from 'fetch-retry';
+// import merge from 'deepmerge';
+// import fetchRetry from 'fetch-retry';
+// export const dynamic = 'force-dynamic';
+// export default async function Page() {
+//     const serviceToken = 'test-token';
+//     const hotelId = '123';
+//     const language = 'en';
+//     const params = { someParam: 'value' };
+
+//     const apiResponse = await get(`/.netlify/functions/test-endpoint/${hotelId}`, {
+//         headers: {
+//             Authorization: `Bearer ${serviceToken}`
+//             //'Cache-Control': 'force-cache'
+//         },
+//         params,
+//         cache: undefined,
+//         next: {
+//             revalidate: 60 * 60 * 24,
+//             tags: [`${language}:${hotelId}`]
+//         }
+//     });
+
+// console.log('Response headers:', Object.fromEntries(apiResponse.headers.entries()));
+// console.log('Cache status:', apiResponse.headers.get('x-vercel-cache'));
+// console.log('Next-Cache:', apiResponse.headers.get('x-next-cache'));
+// console.log('Cache-Control:', apiResponse.headers.get('cache-control'));
+
+//     const response = await apiResponse.json();
+
+//     return (
+//         <div>
+//             <h1>Test Page</h1>
+//             <p>Timestamp: {response.timestamp}</p>
+//             <p>Random: {response.random}</p>
+//         </div>
+//     );
+// }
+
+// const defaultOptions = {
+//     cache: 'no-store',
+//     headers: {
+//         Accept: 'application/json',
+//         'Content-Type': 'application/json'
+//     },
+//     mode: 'cors'
+// };
+
+// const wrappedFetch = fetchRetry(fetch, {
+//     retries: 3,
+//     retryDelay: function (attempt) {
+//         return Math.pow(2, attempt) * 150; // 150, 300, 600
+//     }
+// });
+
+// export async function get(endpoint, options, params = {}) {
+//     const url = new URL(endpoint, 'https://astro-function-site.netlify.app');
+//     url.search = new URLSearchParams(params).toString();
+//     console.log('GET', url);
+//     return wrappedFetch(url, merge.all([defaultOptions, { method: 'GET' }, options]));
+// }
+
+
 export const dynamic = 'force-dynamic';
 export default async function Page() {
     const serviceToken = 'test-token';
@@ -44,49 +104,35 @@ export default async function Page() {
     const language = 'en';
     const params = { someParam: 'value' };
 
-    const apiResponse = await get(`/.netlify/functions/test-endpoint/${hotelId}`, {
-        headers: {
-            Authorization: `Bearer ${serviceToken}`
-            //'Cache-Control': 'force-cache'
-        },
-        params,
-        cache: undefined,
-        next: {
-            revalidate: 60 * 60 * 24,
-            tags: [`${language}:${hotelId}`]
-        }
+    const timeApi = await fetch('https://timeapi.io/api/time/current/zone?timeZone=Europe%2FAmsterdam', {
+        cache: 'no-store'
     });
 
+    const apiResponse = await fetch(
+        `https://astro-function-site.netlify.app/.netlify/functions/test-endpoint/${hotelId}`,
+        {
+            headers: {
+                Authorization: `Bearer ${serviceToken}`
+                //'Cache-Control': 'force-cache'
+            },
+            params,
+            cache: undefined,
+            next: {
+                revalidate: 60 * 60 * 24,
+                tags: [`${language}:${hotelId}`]
+            }
+        }
+    );
+
     const response = await apiResponse.json();
+    const timeResponse = await timeApi.json();
 
     return (
         <div>
             <h1>Test Page</h1>
+            <p>UNCACHED: {timeResponse.dateTime}</p>
             <p>Timestamp: {response.timestamp}</p>
             <p>Random: {response.random}</p>
         </div>
     );
-}
-
-const defaultOptions = {
-    cache: 'no-store',
-    headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-    },
-    mode: 'cors'
-};
-
-const wrappedFetch = fetchRetry(fetch, {
-    retries: 3,
-    retryDelay: function (attempt) {
-        return Math.pow(2, attempt) * 150; // 150, 300, 600
-    }
-});
-
-export async function get(endpoint, options, params = {}) {
-    const url = new URL(endpoint, 'https://astro-function-site.netlify.app');
-    url.search = new URLSearchParams(params).toString();
-    console.log('GET', url);
-    return wrappedFetch(url, merge.all([defaultOptions, { method: 'GET' }, options]));
 }
