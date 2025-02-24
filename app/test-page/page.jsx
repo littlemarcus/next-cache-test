@@ -104,9 +104,17 @@ export default async function Page() {
     const language = 'en';
     const params = { someParam: 'value' };
 
+    console.log('About to make time API request with options:', {
+        cache: 'no-store'
+    });
+
     const timeApi = await fetch('https://timeapi.io/api/time/current/zone?timeZone=Europe%2FAmsterdam', {
         cache: 'no-store'
     });
+
+    console.log('Time API response headers:', Object.fromEntries(timeApi.headers.entries()));
+
+    const longKey='AsuperlongcachekeythatwillbreakthecacheAsuperlongcachekeythatwillbreakthecacheAsuperlongcachekeythatwillbreakthecacheAsuperlongcachekeythatwillbreakthecacheAsuperlongcachekeythatwillbreakthecache{Asuperlongcachekeythatwillbreakthecache:"Asuperlongcachekeythatwillbreakthecache"}Asuperlongcachekeythatwillbreakthecache'
 
     const apiResponse = await fetch(
         `https://astro-function-site.netlify.app/.netlify/functions/test-endpoint/${hotelId}`,
@@ -119,10 +127,13 @@ export default async function Page() {
             cache: undefined,
             next: {
                 revalidate: 60 * 60 * 24,
-                tags: [`${language}:${hotelId}`]
+                tags: [`${language}:${hotelId}:${longKey}`]
             }
         }
     );
+
+    console.log('Cached API response headers:', Object.fromEntries(apiResponse.headers.entries()));
+
 
     const response = await apiResponse.json();
     const timeResponse = await timeApi.json();
